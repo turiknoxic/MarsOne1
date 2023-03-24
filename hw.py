@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, abort
 import datetime
 from data import db_session
 from flask import Flask, render_template, redirect
@@ -7,7 +7,8 @@ from data.jobs import Jobs
 from forms.user import RegisterForm
 from forms.loginform import LoginForm
 from forms.workform import WorkForm
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user,\
+    login_required, logout_user, current_user
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -82,6 +83,7 @@ def logout():
 @app.route('/job_adding', methods=['GET', 'POST'])
 def job_adding():
     form = WorkForm()
+    form.team_leader.data = current_user.id
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         if db_sess.query(Jobs).filter(Jobs.job == form.title.data).first():
@@ -93,7 +95,7 @@ def job_adding():
                                    form=form,
                                    message="Пользователя не существует")
         job = Jobs(
-            team_leader=form.team_leader.data,
+            team_leader=current_user.id,
             job=form.title.data,
             work_size=form.work_size.data,
             collaborators=form.collaborators.data,
