@@ -6,6 +6,7 @@ from data.users import User
 from data.jobs import Jobs
 from forms.user import RegisterForm
 from forms.loginform import LoginForm
+from forms.workform import WorkForm
 from flask_login import LoginManager, login_user, login_required, logout_user
 
 app = Flask(__name__)
@@ -76,6 +77,34 @@ def load_user(user_id):
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route('/job_adding', methods=['GET', 'POST'])
+def job_adding():
+    form = WorkForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        if db_sess.query(Jobs).filter(Jobs.job == form.title.data).first():
+            return render_template('job_addition.html', title='Создание работы',
+                                   form=form,
+                                   message="Такая работа уже существует")
+        if not db_sess.query(User).filter(User.id == form.team_leader.data):
+            return render_template('job_addition.html', title='Создание работы',
+                                   form=form,
+                                   message="Пользователя не существует")
+        job = Jobs(
+            team_leader=form.team_leader.data,
+            job=form.title.data,
+            work_size=form.work_size.data,
+            collaborators=form.collaborators.data,
+            is_finished=form.is_finished.data
+        )
+        db_sess.add(job)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('job_addition.html', title='Создание работы',
+                           form=form)
+
 
 
 def main():

@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+
 </head>
 <body>
 {% extends "base.html" %}
 
 {% block content %}
 <h1 style="text-align: center">Works log</h1>
+
 {% for item in jobs%}
 <div class="col-md6 border rounded">
     <h2>{{item.title}}</h2>
