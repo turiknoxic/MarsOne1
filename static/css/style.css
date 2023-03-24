@@ -1,0 +1,13 @@
+th, td {
+  border-bottom: 1px solid #ddd;
+  padding: 15px;
+  text-align: center;
+}
+td {
+    background-color: #eeeeff
+}
+th {
+    background-color: #dddddd
+}
+
+
