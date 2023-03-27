@@ -101,7 +101,9 @@ def job_adding():
             collaborators=form.collaborators.data,
             is_finished=form.is_finished.data
         )
-        db_sess.add(job)
+        # db_sess.add(job)
+        current_user.jobs.append(job)
+        db_sess.merge(current_user)
         db_sess.commit()
         return redirect('/')
     return render_template('job_addition.html', title='Создание работы',
@@ -112,6 +114,7 @@ def job_adding():
 @login_required
 def edit_job(id):
     form = WorkForm()
+    form.team_leader.data = current_user.id
     if request.method == "GET":
         db_sess = db_session.create_session()
         jobs = db_sess.query(Jobs).filter(Jobs.id == id,
@@ -152,7 +155,7 @@ def edit_job(id):
                            )
 
 
-@app.route('/job_adding/<int:id>', methods=['GET', 'POST'])
+@app.route('/job_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def job_delete(id):
     db_sess = db_session.create_session()
